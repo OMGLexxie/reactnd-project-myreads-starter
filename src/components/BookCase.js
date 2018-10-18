@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import {Link} from 'react-router-dom'
 import BookShelf from './BookShelf'
 
 class BookCase extends Component {
@@ -40,11 +41,14 @@ class BookCase extends Component {
           </div>
           <div className="list-books-content">
             <div>
-              {shelves && shelves.map((shelf) => (<BookShelf key={shelf.name} shelf={shelf} />))}
+              {shelves && shelves.map((shelf) => (<BookShelf
+                key={shelf.name}
+                shelf={shelf}
+                onChangeShelf={this.props.onChangeShelf} />))}
             </div>
           </div>
           <div className="open-search">
-            <a onClick={() => this.setState({ showSearchPage: true })}>Add a book</a>
+            <Link to='/search'>Add a book</Link>
           </div>
         </div>
       </div>
