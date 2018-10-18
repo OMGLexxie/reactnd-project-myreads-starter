@@ -9,9 +9,7 @@ import BookCase from './components/BookCase'
 import Search from './components/Search'
 
 class BooksApp extends React.Component {
-  state = {
-    showSearchPage: false
-  }
+  state = {}
 
   componentDidMount = () => {
     if (this.state.newBook) {
@@ -22,8 +20,7 @@ class BooksApp extends React.Component {
   refreshAllBooks = () => {
     BooksAPI.getAll().then((list) => {
       this.setState({
-        books: BookUtils.sortAllBooks(list),
-        newBook: false
+        books: BookUtils.sortAllBooks(list)
       });
     });
   }

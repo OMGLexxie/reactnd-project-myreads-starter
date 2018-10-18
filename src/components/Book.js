@@ -14,12 +14,10 @@ class Book extends Component {
 		return (
             <div className="book">
               	<div className="book-top">
-              	<button className="book-cover-button" onClick={(e) => this.props.onUpdateQuickView(e, this.props.book)}>
 	                <div
 	                	className="book-cover"
 	                	style={{ width: 128, height: 193, backgroundImage: url }}>
 	                </div>
-                </button>
                 <Changer book={this.props.book} onChangeShelf={this.props.onChangeShelf} />
               	</div>
               	<div className="book-title">{this.props.book.title}</div>
