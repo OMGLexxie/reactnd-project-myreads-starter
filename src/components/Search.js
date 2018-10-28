@@ -1,80 +1,74 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import * as BooksAPI from '../BooksAPI'
-import * as BookUtils from '../BookUtils'
-import Book from './Book'
 
 class Search extends Component {
   state = {
-    query: "", books: [], quickView: {}, showModal: false
+    query: '',
+    queryResults: []
   }
 
-  queryTimer = null;
-
-  changeQuery = (value) => {
-    clearTimeout(this.queryTimer);
-    this.setState({query: value});
-    this.queryTimer = setTimeout(this.updateSearch, 250);
+  changeQuery = (query) => {
+    this.setState({ query: query });
+    this.updateSearch(query)
   }
 
-  updateSearch = () => {
-    if (this.state.query === "") {
-      this.setState({error: false, books: []})
-      return;
-    }
-
-    BooksAPI.search(this.state.query).then(response => {
-      let newList = [];
-      let newError = false;
-      if (response === undefined || (response.error && response.error !== "empty query")) {
-        newError = true;
-      } else if (response.length) {
-        newList = BookUtils.mergeShelfAndSearch(this.props.selectedBooks, response);
-        newList = BookUtils.sortAllBooks(newList);
+  updateSearch = (query) => {
+    BooksAPI.search(query).then(runQuery => {
+      if (runQuery === undefined || runQuery.error) {
+        this.setState({ queryResults: [] })
+      } else {
+        this.setState({ queryResults: runQuery })
       }
-
-      this.setState({error: newError, books: newList})
     })
   }
 
-  componentWillReceiveProps = (props) => {
-    this.props = props;
-    let newList = BookUtils.mergeShelfAndSearch(this.props.selectedBooks, this.state.books);
-    newList = BookUtils.sortAllBooks(newList);
-    this.setState({books: newList});
-  }
-
   render() {
+
+    const { query, queryResults } = this.state;
+
     return (
       <div className="search-books">
         <div className="search-books-bar">
           <Link className="close-search" to='/'>Close</Link>
           <div className="search-books-input-wrapper">
-            <input type="text" placeholder="Search by title or author"
-            onChange = {(e) => this.changeQuery(e.target.value)} value={this.state.query.value}/>
+            <input
+              type="text"
+              placeholder="Search by title or author"
+              value={query}
+              onChange = {(e) => this.changeQuery(e.target.value)}
+            />
           </div>
         </div>
         <div className="search-books-results">
-          {this.state.error && (
-            <div className="search-error">
-              There was a problem with your search
-            </div>
-          )}
-          {!this.state.error && (
-            <span className="search-count">
-              {this.state.books.length}&nbsp; books match your search
-            </span>
-          )}
+          <span className="search-count">
+            Found {queryResults.length} results
+          </span>
 
           <ol className="books-grid">
-            {this.state.books && this.state.books.map(book => (
-                <li key={book.id}>
-                  <Book
-                      book={book}
-                      onChangeShelf={this.props.onChangeShelf}
-                      onUpdateQuickView={this.updateQuickView}/>
-                </li>
-              ))}
+            {queryResults.map(book => (
+              <li key={book.id} className="book">
+                <div className="book-top">
+                  <div
+                    className="book-cover"
+                    style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}>
+                  </div>
+                  <div className="book-shelf-changer">
+                    <select
+                      value={book.shelf}
+                      onChange={(e) => this.props.onChangeShelf(book, e.target.value)}>
+                      <option value="move" disabled>Move to...</option>
+                      <option value="currentlyReading">Currently Reading</option>
+                      <option value="wantToRead">Want to Read</option>
+                      <option value="read">Read</option>
+                      <option value="none">None</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="book-title">{book.title}</div>
+                <div className="book-authors">{book.authors}</div>
+              </li>
+            ))}
           </ol>
         </div>
       </div>
