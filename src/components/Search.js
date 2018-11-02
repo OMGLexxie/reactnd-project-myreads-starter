@@ -2,10 +2,13 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import * as BooksAPI from '../BooksAPI'
 
+import Book from './Book'
+
 class Search extends Component {
   state = {
     query: '',
-    queryResults: []
+    queryResults: [],
+    books: []
   }
 
   changeQuery = (query) => {
@@ -47,27 +50,12 @@ class Search extends Component {
 
           <ol className="books-grid">
             {queryResults.map(book => (
-              <li key={book.id} className="book">
-                <div className="book-top">
-                  <div
-                    className="book-cover"
-                    style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}>
-                  </div>
-                  <div className="book-shelf-changer">
-                    <select
-                      value={book.shelf}
-                      onChange={(e) => this.props.onChangeShelf(book, e.target.value)}>
-                      <option value="move" disabled>Move to...</option>
-                      <option value="none">None</option>
-                      <option value="currentlyReading">Currently Reading</option>
-                      <option value="wantToRead">Want to Read</option>
-                      <option value="read">Read</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="book-title">{book.title}</div>
-                <div className="book-authors">{book.authors}</div>
-              </li>
+              <Book
+                key={book.id}
+                book={book}
+                books={this.props.books}
+                onChangeShelf={this.props.onChangeShelf}
+              />
             ))}
           </ol>
         </div>
